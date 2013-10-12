@@ -44,8 +44,7 @@ bool CCPanGestureRecognizer::ccTouchBegan(CCTouch * pTouch, CCEvent * pEvent)
     CCPoint loc = pTouch->getLocation();
     if (!isPositionBetweenBounds(loc)) return false;
     
-    isRecognizing = true;
-    return true;
+	return true;
 }
 
 void CCPanGestureRecognizer::ccTouchMoved(CCTouch * pTouch, CCEvent * pEvent)
@@ -53,11 +52,23 @@ void CCPanGestureRecognizer::ccTouchMoved(CCTouch * pTouch, CCEvent * pEvent)
     CCPan * pan = CCPan::create();
     pan->location = pTouch->getLocation();
     pan->delta = pTouch->getDelta();
+	if (!isRecognizing) {
+		isRecognizing = true;
+		pan->phase = CCPan::kPhaseBegin;
+	} else {
+		pan->phase = CCPan::kPhaseMove;
+	}
     gestureRecognized(pan);
 }
 
 void CCPanGestureRecognizer::ccTouchEnded(CCTouch * pTouch, CCEvent * pEvent)
 {
+    CCPan * pan = CCPan::create();
+    pan->location = pTouch->getLocation();
+    pan->delta = pTouch->getDelta();
+	pan->phase = CCPan::kPhaseEnd;
+    gestureRecognized(pan);
+
     isRecognizing = false;
     
     //cancel touch over other views if necessary

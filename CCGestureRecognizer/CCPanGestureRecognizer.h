@@ -33,6 +33,12 @@ public:
     CREATE_FUNC(CCPan);
     cocos2d::CCPoint location;
     cocos2d::CCPoint delta;
+	enum Phase {
+		kPhaseBegin,
+		kPhaseMove,
+		kPhaseEnd
+	};
+	Phase phase;
 };
 
 class CCPanGestureRecognizer : public CCGestureRecognizer
