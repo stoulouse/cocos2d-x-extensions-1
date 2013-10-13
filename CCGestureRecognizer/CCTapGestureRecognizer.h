@@ -31,7 +31,7 @@ THE SOFTWARE.
 #define kTapMaxDistanceBetweenTaps 20
 
 //this class is used for storing information about the tap gesture
-class CCTap : public cocos2d::CCObject
+class CCTap : public CCGesture
 {
 public:
     bool init() {return true;}

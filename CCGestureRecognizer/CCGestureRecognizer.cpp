@@ -70,6 +70,22 @@ void CCGestureRecognizer::setParent(CCNode*p)
     }
 }
 
+void CCGestureRecognizer::setPosition(const CCPoint& p)
+{
+    CCLayer::setContentSize(p);
+//    
+//	if (getParent())
+//		frame = getParent()->boundingBox();
+}
+
+void CCGestureRecognizer::setContentSize(const CCSize& size)
+{
+    CCLayer::setContentSize(size);
+//    
+//	if (getParent())
+//		frame = getParent()->boundingBox();
+}
+
 CCSet * CCGestureRecognizer::createSetWithTouch(CCTouch * pTouch)
 {
     CCSet * set = new CCSet();
@@ -84,10 +100,16 @@ void CCGestureRecognizer::registerWithTouchDispatcher()
 
 bool CCGestureRecognizer::isPositionBetweenBounds(CCPoint pos)
 {
+	if (getParent() && getParent()->getParent()) {
+		frame = getParent()->boundingBox();
+		frame.origin = getParent()->getParent()->convertToWorldSpace(frame.origin);
+	}
     return frame.containsPoint(pos);
 }
 
-void CCGestureRecognizer::gestureRecognized(cocos2d::CCObject * gesture)
+void CCGestureRecognizer::gestureRecognized(CCGesture * gesture)
 {
+	gesture->userObject = getUserObject();
+	gesture->userData = getUserData();
     if (target && selector) (target->*selector)(gesture); //call selector
 }

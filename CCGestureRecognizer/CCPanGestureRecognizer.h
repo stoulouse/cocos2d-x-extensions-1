@@ -26,7 +26,7 @@ THE SOFTWARE.
 #include "CCGestureRecognizer.h"
 
 //this class is used for storing information about the pan gesture
-class CCPan : public cocos2d::CCObject
+class CCPan : public CCGesture
 {
 public:
     bool init() {return true;}

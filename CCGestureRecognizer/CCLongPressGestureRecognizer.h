@@ -28,7 +28,7 @@ THE SOFTWARE.
 #define kLongPressMinDuration 0.5
 
 //this class is used for storing information about the long press gesture
-class CCLongPress : public cocos2d::CCObject
+class CCLongPress : public CCGesture
 {
 public:
     bool init() {return true;}

@@ -25,6 +25,15 @@ THE SOFTWARE.
 
 #include "cocos2d.h"
 
+class CCGesture : public cocos2d::CCObject
+{
+public:
+	CCGesture() : userObject(0), userData(0) {}
+    bool init() {return true;}
+	cocos2d::CCObject* userObject;
+	int userData;
+};
+
 class CCGestureRecognizer : public cocos2d::CCLayer
 {
 public:
@@ -34,11 +43,15 @@ public:
     
     //setParent is called after the layer is added as a child
     virtual void setParent(cocos2d::CCNode*p);
+	
+	virtual void setPosition(const cocos2d::CCPoint& p);
+	virtual void setContentSize(const cocos2d::CCSize& size);
+	
 protected:
     cocos2d::CCRect frame;
     bool isRecognizing;
     
-    void gestureRecognized(cocos2d::CCObject * gesture);
+    void gestureRecognized(CCGesture * gesture);
     void stopTouchesPropagation(cocos2d::CCSet * pTouches, cocos2d::CCEvent * pEvent);
     
     //utility methods
@@ -56,6 +69,10 @@ protected:
     //if gesture is correctly recognized, cancel touch over other views (default: false)
     //NOTE: subclasses must check the value and implement it correctly
     CC_SYNTHESIZE(bool, cancelsTouchesInView, CancelsTouchesInView);
+
+    CC_SYNTHESIZE(cocos2d::CCObject*, userObject, UserObject);
+    CC_SYNTHESIZE(int, userData, UserData);
+
 private:
     cocos2d::SEL_CallFuncO selector;
     cocos2d::CCObject * target;

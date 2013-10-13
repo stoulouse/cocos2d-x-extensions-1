@@ -36,7 +36,7 @@ typedef enum {
 } CCSwipeGestureRecognizerDirection;
 
 //this class is used for storing information about the swipe gesture
-class CCSwipe : public cocos2d::CCObject
+class CCSwipe : public CCGesture
 {
 public:
     bool init() {return true;}
