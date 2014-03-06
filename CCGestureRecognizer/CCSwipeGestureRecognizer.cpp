@@ -28,6 +28,8 @@ USING_NS_CC;
 bool CCSwipeGestureRecognizer::init()
 {
     direction = 0;
+	minDistance = kSwipeMinDistance;
+	maxDuration = kSwipeMaxDuration;
     return true;
 }
 
@@ -36,12 +38,35 @@ CCSwipeGestureRecognizer::~CCSwipeGestureRecognizer()
     
 }
 
+CCSwipeGestureRecognizerDirection CCSwipeGestureRecognizer::swipeDirection(CCPoint p1, CCPoint p2)
+{
+    float right = p2.x-p1.x;
+    float left = p1.x-p2.x;
+    float down = p1.y-p2.y;
+    float up = p2.y-p1.y;
+    
+    if (right > left && right > up && right > down) {
+		return kSwipeGestureRecognizerDirectionRight;
+    }
+    else if (left > up && left > down) {
+            return kSwipeGestureRecognizerDirectionLeft;
+    }
+    else if (up > down) {
+            return kSwipeGestureRecognizerDirectionUp;
+    }
+    else {
+            return kSwipeGestureRecognizerDirectionDown;
+    }
+    
+    return kSwipeGestureRecognizerDirectionLeft;
+}
+
 bool CCSwipeGestureRecognizer::checkSwipeDirection(CCPoint p1, CCPoint p2, int & dir)
 {
-    bool right = p2.x-p1.x>=kSwipeMinDistance;
-    bool left = p1.x-p2.x>=kSwipeMinDistance;
-    bool down = p1.y-p2.y>=kSwipeMinDistance;
-    bool up = p2.y-p1.y>=kSwipeMinDistance;
+    bool right = p2.x-p1.x>=minDistance;
+    bool left = p1.x-p2.x>=minDistance;
+    bool down = p1.y-p2.y>=minDistance;
+    bool up = p2.y-p1.y>=minDistance;
     
     if (right) {
         if ((direction & kSwipeGestureRecognizerDirectionRight) == kSwipeGestureRecognizerDirectionRight) {
@@ -87,6 +112,43 @@ bool CCSwipeGestureRecognizer::ccTouchBegan(CCTouch * pTouch, CCEvent * pEvent)
     return true;
 }
 
+void CCSwipeGestureRecognizer::ccTouchMoved(CCTouch * pTouch, CCEvent * pEvent)
+{
+    CCPoint finalPosition = pTouch->getLocation();
+//    if (!isPositionBetweenBounds(finalPosition)) {
+//        isRecognizing = false;
+//        return;
+//    }
+    
+    //distance between initial and final point of touch
+    float distance = distanceBetweenPoints(initialPosition, finalPosition);
+    
+    struct cc_timeval currentTime;
+    CCTime::gettimeofdayCocos2d(&currentTime, NULL);
+    
+    double duration = CCTime::timersubCocos2d(&startTime, &currentTime); //duration in milliseconds
+    
+    //check that minimum distance has been reached
+    //check that maximum duration hasn't been reached
+    //check if the direction of the swipe is correct
+    CCSwipeGestureRecognizerDirection dir = swipeDirection(initialPosition, finalPosition);
+	//    if (distance>=minDistance && duration<=maxDuration && checkSwipeDirection(initialPosition,finalPosition,dir))
+	{
+        CCSwipe * swipe = CCSwipe::create();
+        swipe->direction = (CCSwipeGestureRecognizerDirection)dir;
+        swipe->location = initialPosition;
+		swipe->distance = distance;
+		swipe->duration = duration;
+		swipe->final = false;
+		swipe->completion = distance / minDistance;
+        
+        gestureRecognized(swipe);
+//        if (cancelsTouchesInView) stopTouchesPropagation(createSetWithTouch(pTouch), pEvent); //cancel touch over other views
+    }
+    
+//    isRecognizing = false;
+}
+
 void CCSwipeGestureRecognizer::ccTouchEnded(CCTouch * pTouch, CCEvent * pEvent)
 {
     CCPoint finalPosition = pTouch->getLocation();
@@ -106,11 +168,16 @@ void CCSwipeGestureRecognizer::ccTouchEnded(CCTouch * pTouch, CCEvent * pEvent)
     //check that minimum distance has been reached
     //check that maximum duration hasn't been reached
     //check if the direction of the swipe is correct
-    int dir = 0;
-    if (distance>=kSwipeMinDistance && duration<=kSwipeMaxDuration && checkSwipeDirection(initialPosition,finalPosition,dir)) {
+    CCSwipeGestureRecognizerDirection dir = swipeDirection(initialPosition, finalPosition);
+//    if (distance>=minDistance && duration<=maxDuration && checkSwipeDirection(initialPosition,finalPosition,dir))
+	{
         CCSwipe * swipe = CCSwipe::create();
         swipe->direction = (CCSwipeGestureRecognizerDirection)dir;
         swipe->location = initialPosition;
+		swipe->distance = distance;
+		swipe->duration = duration;
+		swipe->final = true;
+		swipe->completion = distance / minDistance;
         
         gestureRecognized(swipe);
         if (cancelsTouchesInView) stopTouchesPropagation(createSetWithTouch(pTouch), pEvent); //cancel touch over other views

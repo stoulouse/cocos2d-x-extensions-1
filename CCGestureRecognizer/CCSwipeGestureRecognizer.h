@@ -25,7 +25,7 @@ THE SOFTWARE.
 
 #include "CCGestureRecognizer.h"
 
-#define kSwipeMaxDuration 300
+#define kSwipeMaxDuration 500
 #define kSwipeMinDistance 60
 
 typedef enum {
@@ -43,6 +43,10 @@ public:
     CREATE_FUNC(CCSwipe);
     CCSwipeGestureRecognizerDirection direction;
     cocos2d::CCPoint location;
+	float distance;
+	double duration;
+	bool final;
+	float completion;
 };
 
 class CCSwipeGestureRecognizer : public CCGestureRecognizer
@@ -53,15 +57,18 @@ public:
     CREATE_FUNC(CCSwipeGestureRecognizer);
     
     virtual bool ccTouchBegan(cocos2d::CCTouch * pTouch, cocos2d::CCEvent * pEvent);
-    virtual void ccTouchMoved(cocos2d::CCTouch * pTouch, cocos2d::CCEvent * pEvent){};
+    virtual void ccTouchMoved(cocos2d::CCTouch * pTouch, cocos2d::CCEvent * pEvent);
     virtual void ccTouchEnded(cocos2d::CCTouch * pTouch, cocos2d::CCEvent * pEvent);
 protected:
     CC_SYNTHESIZE(int, direction, Direction);
+    CC_SYNTHESIZE(float, minDistance, MinDistance);
+    CC_SYNTHESIZE(double, maxDuration, MaxDuration);
 private:
     cocos2d::CCPoint initialPosition;
     struct cocos2d::cc_timeval startTime;
-    
+	
     bool checkSwipeDirection(cocos2d::CCPoint p1, cocos2d::CCPoint p2, int & dir);
+	CCSwipeGestureRecognizerDirection swipeDirection(cocos2d::CCPoint p1, cocos2d::CCPoint p2);
 };
 
 #endif
